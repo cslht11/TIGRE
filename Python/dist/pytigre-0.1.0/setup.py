@@ -228,7 +228,6 @@ setup(name='pytigre',
       py_modules=['tigre.py'],
       # inject our custom trigger
       cmdclass={'build_ext': custom_build_ext},
-      license_file = 'LICENSE.txt',
-      license  = 'BSD 3-Clause',
+
       # since the package has c code, the egg cannot be zipped
       zip_safe=False)

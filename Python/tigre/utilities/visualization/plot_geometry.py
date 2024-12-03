@@ -15,9 +15,16 @@ class Arrow3D(matplotlib.patches.FancyArrowPatch):
         from mpl_toolkits.mplot3d import proj3d
 
         xs3d, ys3d, zs3d = self._verts3d
-        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, renderer.M)
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
         self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
         matplotlib.patches.FancyArrowPatch.draw(self, renderer)
+
+    def do_3d_projection(self, render=None):
+        from mpl_toolkits.mplot3d import proj3d
+        xs3d, ys3d, zs3d = self._verts3d
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
+        self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
+        return np.min(zs)
 
 
 ROT_DEFAULT = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -26,7 +33,7 @@ TRANS_DEFAULT = np.array([0, 0, 0])
 
 def pathpatch_2d_to_3d_affine(pathpatch, mat_rot=ROT_DEFAULT, vec_trans=TRANS_DEFAULT):
     """
-    Transforms a 2D Patch to a 3D patch using the affine tranform
+    Transforms a 2D Patch to a 3D patch using the affine transform
     of the given rotation matrix and translation vector.
     The pathpatch is assumed to be on the plane Z = 0.
     """
@@ -155,7 +162,7 @@ def plot_geometry(geo, angle=0):
     # Image FOV
     alpha_img = 0.1
     offOrigin = np.array([geo.offOrigin[2], geo.offOrigin[1], geo.offOrigin[0]])
-    mat_rot_xy = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=np.float)
+    mat_rot_xy = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=np.float32)
     for idx in range(2):
         img_face_xy = matplotlib.patches.Rectangle(
             (-geo.sVoxel[2] / 2, -geo.sVoxel[1] / 2),  # xy order
@@ -173,7 +180,7 @@ def plot_geometry(geo, angle=0):
             np.array([0, 0, -geo.sVoxel[0] / 2 if idx == 0 else geo.sVoxel[0] / 2]) + offOrigin,
         )
 
-    mat_rot_yz = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]], dtype=np.float)
+    mat_rot_yz = np.array([[0, 0, 1], [1, 0, 0], [0, 1, 0]], dtype=np.float32)
     for idx in range(2):
         img_face_yz = matplotlib.patches.Rectangle(
             (-geo.sVoxel[1] / 2, -geo.sVoxel[0] / 2),  # xy order
@@ -191,7 +198,7 @@ def plot_geometry(geo, angle=0):
             np.array([-geo.sVoxel[2] / 2 if idx == 0 else geo.sVoxel[2] / 2, 0, 0]) + offOrigin,
         )
 
-    mat_rot_zx = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]], dtype=np.float)
+    mat_rot_zx = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]], dtype=np.float32)
     for idx in range(2):
         img_face_zx = matplotlib.patches.Rectangle(
             (-geo.sVoxel[0] / 2, -geo.sVoxel[2] / 2),  # xy order
